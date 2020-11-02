@@ -10,10 +10,10 @@ import java.util.List;
 @Entity
 @Getter @Setter
 public class Member {
+
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
-
     private String name;
 
     @Embedded
