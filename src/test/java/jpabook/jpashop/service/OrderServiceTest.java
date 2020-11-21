@@ -98,10 +98,15 @@ public class OrderServiceTest {
         // given
         Member member = createMember();
         Book book = createBook("JDAS", 10000, 10);
+        int orderCount = 2;
+        Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
 
         // when
+        orderService.cancel(orderId);
 
         // then
+        Assertions.assertEquals(OrderStatus.CANCEL.getNm(), orderRepository.findOne(orderId).getStatus().getNm());
+        Assertions.assertEquals(book.getStockQuantity(), 10);
     }
 
  }
