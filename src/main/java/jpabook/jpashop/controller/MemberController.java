@@ -1,5 +1,6 @@
 package jpabook.jpashop.controller;
 
+import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -36,5 +38,14 @@ public class MemberController {
         memberService.join(memberForm.toEntity());
         log.info("members join");
         return "redirect:/";
+    }
+
+    @GetMapping("/members")
+    public String list(Model model)
+    {
+        List<Member> memberList = memberService.findMembers();
+        model.addAttribute("members", memberList);
+
+        return "members/memberList";
     }
 }
