@@ -16,19 +16,17 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 public class ItemController {
-    private  final ItemService itemService;
+    private final ItemService itemService;
 
     @GetMapping("/items/new")
-    public String createForm(Model model)
-    {
+    public String createForm(Model model) {
         model.addAttribute("form", new BookForm());
         return "items/createItemForm";
     }
 
     @PostMapping("/items/new")
-    public String create(BookForm form)
-    {
-        Book book= new Book();
+    public String create(BookForm form) {
+        Book book = new Book();
         book.setName(form.getName());
         book.setPrice(form.getPrice());
         book.setStockQuantity(form.getStockQuantity());
@@ -41,16 +39,14 @@ public class ItemController {
     }
 
     @GetMapping("/items")
-    public String list(Model model)
-    {
+    public String list(Model model) {
         List<Item> itemList = itemService.findItems();
         model.addAttribute("items", itemList);
         return "items/itemList";
     }
 
     @GetMapping("/items/{itemId}/edit")
-    public String updateItemForm(@PathVariable(value = "itemId") Long itemId, Model model)
-    {
+    public String updateItemForm(@PathVariable(value = "itemId") Long itemId, Model model) {
         Book book = (Book) itemService.findOne(itemId);
         BookForm form = new BookForm();
         form.setStockQuantity(book.getStockQuantity());
@@ -64,16 +60,12 @@ public class ItemController {
     }
 
     @PostMapping("/items/{itemId}/edit")
-    public String updateItem(@ModelAttribute("form") BookForm form, Model model){
-        Book book = new Book();
-        book.setIsbn(form.getIsbn());
-        book.setAuthor(form.getAuthor());
-        book.setStockQuantity(form.getStockQuantity());
-        book.setPrice(form.getPrice());
-        book.setName(form.getName());
-        book.setId(form.getId());
-
-        itemService.saveItem(book);
+    public String updateItem(
+            @PathVariable(value = "itemId") Long itemId
+            , @ModelAttribute("form") BookForm form
+            , Model model)
+    {
+        itemService.updateItem(itemId, form.getName(), form.getPrice(), form.getStockQuantity());
 
         model.addAttribute("form", form);
         return "redirect:/items";
