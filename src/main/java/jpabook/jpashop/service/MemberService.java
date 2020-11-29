@@ -26,6 +26,7 @@ public class MemberService {
         return member.getId();
     }
 
+
     private void validateDuplicateMember(Member member)
     {
         List<Member> findMembers = memberRepository.findByName(member.getName());
@@ -43,5 +44,12 @@ public class MemberService {
     public Member findOne(Long memberId)
     {
         return memberRepository.findOne(memberId);
+    }
+
+    @Transactional
+    public void update(Long id, String name)
+    {
+        Member member = memberRepository.findOne(id);
+        member.setName(name);
     }
 }

@@ -14,7 +14,6 @@ public class Delivery {
     private Long id;
 
     @OneToOne(mappedBy = "delivery", fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id")
     private Order order;
 
     @Embedded

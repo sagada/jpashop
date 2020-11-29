@@ -8,16 +8,17 @@ import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.exception.NotEnoughStockException;
 import jpabook.jpashop.repository.OrderRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
+import static jpabook.jpashop.domain.OrderStatus.ORDER;
 import static org.junit.Assert.fail;
 
 @RunWith(SpringRunner.class)
@@ -70,10 +71,8 @@ public class OrderServiceTest {
         // then
         Order order = orderRepository.findOne(orderId);
 
-        Assertions.assertEquals(OrderStatus.ORDER.getNm(), order.getStatus().getNm());
-        Assertions.assertEquals(1, order.getOrderItems().size());
-        Assertions.assertEquals(10000 * 2,order.getTotalPrice());
-        Assertions.assertEquals(8, book.getStockQuantity());
+        Assertions.assertThat(order.getStatus()).isEqualTo(ORDER);
+        Assertions.assertThat(order.getOrderItems().size()).isEqualTo(1);
     }
 
     @Test(expected = NotEnoughStockException.class)
@@ -105,8 +104,23 @@ public class OrderServiceTest {
         orderService.cancel(orderId);
 
         // then
-        Assertions.assertEquals(OrderStatus.CANCEL.getNm(), orderRepository.findOne(orderId).getStatus().getNm());
-        Assertions.assertEquals(book.getStockQuantity(), 10);
+        Assertions.assertThat(orderRepository.findOne(orderId).getStatus()).isEqualTo(OrderStatus.CANCEL);
     }
+
+    @Test
+    public void 주문테스트_딜리버리_테스트() throws Exception
+    {
+        // given
+        Member member = createMember();
+        Item item = createBook("JPA 읽자", 30000, 10);
+
+        int orderCount = 11;
+
+        Long orderId = orderService.order(member.getId(), item.getId(), 3);
+        Order order = orderRepository.findOne(orderId);
+
+        Assertions.assertThat(order.getDelivery().getAddress()).isEqualTo(member.getAddress());
+    }
+
 
  }
