@@ -1,6 +1,5 @@
 package jpabook.jpashop.repository;
 
-import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -28,7 +27,8 @@ public class OrderRepository {
     {
         //language=JPAQL
         String jpql = "select o From Order o join o.member m"; boolean isFirstCondition = true;
-//주문 상태 검색
+
+        //주문 상태 검색
         if (orderSearch.getOrderStatus() != null) {
             if (isFirstCondition) {
                 jpql += " where";
@@ -37,7 +37,8 @@ public class OrderRepository {
                 jpql += " and";
             }
             jpql += " o.status = :status"; }
-//회원 이름 검색
+
+        //회원 이름 검색
         if (StringUtils.hasText(orderSearch.getMemberName())) {
             if (isFirstCondition) {
                 jpql += " where";
@@ -54,5 +55,18 @@ public class OrderRepository {
         if (StringUtils.hasText(orderSearch.getMemberName())) {
             query = query.setParameter("name", orderSearch.getMemberName()); }
         return query.getResultList();
+    }
+
+    public List<Order> findAllWithMemberDelivert()
+    {
+        return em.createQuery("SELECT o FROM Order o join fetch o.member m join fetch o.delivery d", Order.class)
+        .getResultList();
+    }
+
+    public List<SimpleOrderQueryDto> findOrderDtos()
+    {
+        return em.createQuery("SELECT new jpabook.jpashop.repository.SimpleOrderQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+                " FROM Order o join o.member m join o.delivery d", SimpleOrderQueryDto.class)
+        .getResultList();
     }
 }
